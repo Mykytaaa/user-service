@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-constraint-nullable-false-user-details-id-fk
+      author: Mykyta
+      changes:
+        - addNotNullConstraint:
+            tableName: users
+            columnName: user_details_id

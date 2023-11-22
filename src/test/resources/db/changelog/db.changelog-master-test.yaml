@@ -4,6 +4,12 @@ databaseChangeLog:
       value: NOW()
       dbms: postgresql
   - include:
-      file: db/changelog/db.changelog-master.yaml
+      file: db/changelog/changeset/create-users-table.yaml
   - include:
       file: db/changelog/db.changelog-populate-test-data.yaml
+  - include:
+      file: db/changelog/changeset/create-user-details-table.yaml
+  - include:
+      file: db/changelog/db.changelog-populate-user-details-data.yaml
+  - include:
+      file: db/changelog/changeset/create-constraint-nullable-false-user-details-id-fk.yaml

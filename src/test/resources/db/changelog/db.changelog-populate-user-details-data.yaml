@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: populate-user-details
+      author: Mykyta
+      changes:
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: phone_number
+                  value: '+919367788755'
+              - column:
+                  name: telegram_id
+                  value: '@firstTelegram_id'
+              - column:
+                  name: created_at
+                  value: ${now}
+              - column:
+                  name: updated_at
+                  value: ${now}
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: phone_number
+                  value: '+919542348755'
+              - column:
+                  name: telegram_id
+                  value: '@secondTelegram_id'
+              - column:
+                  name: created_at
+                  value: ${now}
+              - column:
+                  name: updated_at
+                  value: ${now}
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: phone_number
+                  value: '+919243456755'
+              - column:
+                  name: telegram_id
+                  value: '@thirdTelegram_id'
+              - column:
+                  name: created_at
+                  value: ${now}
+              - column:
+                  name: updated_at
+                  value: ${now}
+        - update:
+            tableName: users
+            columns:
+              - column:
+                  name: user_details_id
+                  value: 1
+            where: "first_name='John'"
+        - update:
+            tableName: users
+            columns:
+              - column:
+                  name: user_details_id
+                  value: 2
+            where: "first_name='Wacky'"
+        - update:
+            tableName: users
+            columns:
+              - column:
+                  name: user_details_id
+                  value: 3
+            where: "first_name='Lewis'"

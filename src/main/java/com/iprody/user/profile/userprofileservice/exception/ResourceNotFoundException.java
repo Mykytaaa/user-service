@@ -30,6 +30,11 @@ public final class ResourceNotFoundException extends RuntimeException {
         private static final String NOT_FOUND_WITH_ID = "%s not found with id: %d";
 
         /**
+         * Error message template when a User Details entity is not found with a specific User ID.
+         */
+        private static final String NOT_FOUND_USER_DETAILS_WITH_USER_ID = "%s not found user details with user id: %d";
+
+        /**
          * The final form of error message.
          */
         private final String formattedMessage;
@@ -58,6 +63,17 @@ public final class ResourceNotFoundException extends RuntimeException {
          */
         public static ErrorMessage ofId(String domain, long id) {
             return new ErrorMessage(NOT_FOUND_WITH_ID, domain, id);
+        }
+
+        /**
+         * Create an ErrorMessage instance for an entity not found with a specific id.
+         *
+         * @param domain the entity name where the problem occurred.
+         * @param id the id to construct an error string.
+         * @return a formatted exception.
+         */
+        public static ErrorMessage ofUserDetailsByUserId(String domain, long id) {
+            return new ErrorMessage(NOT_FOUND_USER_DETAILS_WITH_USER_ID, domain, id);
         }
 
         private String getMessage() {

@@ -1,13 +1,14 @@
 package com.iprody.user.profile.userprofileservice.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import lombok.NoArgsConstructor;
 
 /**
@@ -20,10 +21,8 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Table(name = "users")
-@EqualsAndHashCode(callSuper = true)
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 public class User extends AbstractBaseEntity {
 
@@ -45,4 +44,22 @@ public class User extends AbstractBaseEntity {
      */
     @Column(unique = true, nullable = false)
     private String email;
+
+    /**
+     * This FK represents a relationship between a User and UserDetails.
+     */
+    @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JoinColumn(name = "user_details_id", referencedColumnName = "id")
+    private UserDetails userDetails;
+
+    /**
+     * Sets the user details for this user.
+     * This method establishes a bidirectional relationship between the user and the user details.
+     *
+     * @param userDetails The UserDetails object to associate with this user.
+     */
+    public void setUserDetails(UserDetails userDetails) {
+        this.userDetails = userDetails;
+        userDetails.setUser(this);
+    }
 }
