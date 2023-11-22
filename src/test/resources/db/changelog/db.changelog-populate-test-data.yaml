@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: Mykyta
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: first_name
+                  value: 'John'
+              - column:
+                  name: last_name
+                  value: 'Walsh'
+              - column:
+                  name: email
+                  value: 'johnwalsh@example.com'
+              - column:
+                  name: created_at
+                  value: ${now}
+              - column:
+                  name: updated_at
+                  value: ${now}
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: first_name
+                  value: 'Wacky'
+              - column:
+                  name: last_name
+                  value: 'Walsh'
+              - column:
+                  name: email
+                  value: 'wackywalsh@example.com'
+              - column:
+                  name: created_at
+                  value: ${now}
+              - column:
+                  name: updated_at
+                  value: ${now}
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: first_name
+                  value: 'Lewis'
+              - column:
+                  name: last_name
+                  value: 'Walsh'
+              - column:
+                  name: email
+                  value: 'lewiswalsh@example.com'
+              - column:
+                  name: created_at
+                  value: ${now}
+              - column:
+                  name: updated_at
+                  value: ${now}

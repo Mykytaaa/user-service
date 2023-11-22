@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - property:
+      name: now
+      value: NOW()
+      dbms: postgresql
+  - include:
+      file: db/changelog/db.changelog-master.yaml
+  - include:
+      file: db/changelog/db.changelog-populate-test-data.yaml
