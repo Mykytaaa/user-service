@@ -35,4 +35,18 @@ public class UserDetails extends AbstractBaseEntity {
      */
     @OneToOne(mappedBy = "userDetails")
     private User user;
+
+    /**
+     * Returns a string representation of the UserDetails object. The string representation
+     * includes the Telegram ID and phone number of the user details.
+     *
+     * @return A string representation of the UserDetails object.
+     */
+    @Override
+    public String toString() {
+        return "UserDetails{"
+                + "telegramId='" + telegramId + '\''
+                + ", phoneNumber='" + phoneNumber + '\''
+                + '}';
+    }
 }

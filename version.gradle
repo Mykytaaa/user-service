@@ -2,6 +2,9 @@ ext {
     versions = [
             'lombok' : '1.18.30',
             'testContainers' : '1.19.1',
-            'liquibaseCore' : '4.25.0'
+            'liquibaseCore' : '4.25.0',
+            'mapStruct' : '1.5.5.Final',
+            'hibernateValidator' : '8.0.1.Final',
+            'openApiWebMvc' : '2.3.0'
     ]
 }

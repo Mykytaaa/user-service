@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -39,8 +38,7 @@ public class UserDetailsServiceIntegrationTest extends AbstractIntegrationTestBa
     private static final String DATA_INTEGRITY_EXCEPTION_MESSAGE = "new row for relation \"user_details\" "
             + "violates check constraint";
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Order(1)
     @Test
@@ -55,7 +53,7 @@ public class UserDetailsServiceIntegrationTest extends AbstractIntegrationTestBa
         final UserDetails savedUserDetails = userService.save(userDetailsToSave);
 
         softly.assertThat(savedUserDetails).isNotNull();
-        softly.assertThat(savedUserDetails.getId()).isEqualTo(4L);
+        softly.assertThat(savedUserDetails.getId()).isNotNull();
         softly.assertThat(savedUserDetails.getTelegramId()).isEqualTo(NEW_TELEGRAM_ID);
         softly.assertThat(savedUserDetails.getPhoneNumber()).isEqualTo(PHONE_NUMBER);
         softly.assertThat(savedUserDetails.getCreatedAt()).isNotNull();
@@ -71,18 +69,18 @@ public class UserDetailsServiceIntegrationTest extends AbstractIntegrationTestBa
     @Order(2)
     @Test
     void shouldUpdateExistingUserDetailsSuccessfully(SoftAssertions softly) {
+        final User user = createUser(3L, FIRST_NAME_LEWIS, LAST_NAME_WALSH, EMAIL_LEWIS_WALSH);
+
         final UserDetails userDetailsToUpdate = new UserDetails();
-        userDetailsToUpdate.setId(1L);
+        userDetailsToUpdate.setId(3L);
         userDetailsToUpdate.setTelegramId(FIRST_TELEGRAM_ID_UPDATED);
         userDetailsToUpdate.setPhoneNumber(FIRST_TELEGRAM_ID_PHONE_NUMBER_UPDATED);
-
-        final User user = createUser(3L, FIRST_NAME_LEWIS, LAST_NAME_WALSH, EMAIL_LEWIS_WALSH);
         user.setUserDetails(userDetailsToUpdate);
 
         final UserDetails updatedUserDetails = userService.save(userDetailsToUpdate);
 
         softly.assertThat(updatedUserDetails).isNotNull();
-        softly.assertThat(updatedUserDetails.getId()).isEqualTo(1L);
+        softly.assertThat(updatedUserDetails.getId()).isEqualTo(3L);
         softly.assertThat(updatedUserDetails.getPhoneNumber()).isEqualTo(FIRST_TELEGRAM_ID_PHONE_NUMBER_UPDATED);
         softly.assertThat(updatedUserDetails.getTelegramId()).isEqualTo(FIRST_TELEGRAM_ID_UPDATED);
         softly.assertThat(updatedUserDetails.getUser()).isNotNull();

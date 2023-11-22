@@ -53,13 +53,31 @@ public class User extends AbstractBaseEntity {
     private UserDetails userDetails;
 
     /**
-     * Sets the user details for this user.
-     * This method establishes a bidirectional relationship between the user and the user details.
+     * Sets the UserDetails for the current user.
      *
-     * @param userDetails The UserDetails object to associate with this user.
+     * This method establishes a bidirectional relationship between the user and UserDetails
+     * by setting the UserDetails for the user and setting the user for the UserDetails.
+     *
+     * @param userDetails The UserDetails to associate with the current user.
      */
     public void setUserDetails(UserDetails userDetails) {
         this.userDetails = userDetails;
         userDetails.setUser(this);
+    }
+
+    /**
+     * Returns a string representation of the User object. The string representation
+     * includes the user's first name, last name, email, and user details.
+     *
+     * @return A string representation of the User object.
+     */
+    @Override
+    public String toString() {
+        return "User{"
+                + "firstName='" + firstName + '\''
+                + ", lastName='" + lastName + '\''
+                + ", email='" + email + '\''
+                + ", userDetails=" + userDetails
+                + '}';
     }
 }
