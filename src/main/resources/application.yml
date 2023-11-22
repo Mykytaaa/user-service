@@ -1,6 +1,12 @@
 spring:
-    datasource:
-        url: jdbc:postgresql://localhost:5432/postgres
-        username: postgres
-        password: 2269
-        driverClassName: org.postgresql.Driver
+  liquibase:
+    enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/user-profile
+    username: postgres
+    password: postgres
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate

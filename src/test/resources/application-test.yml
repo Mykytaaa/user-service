@@ -1,0 +1,7 @@
+spring:
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master-test.yaml
+  jpa:
+    properties.hibernate:
+      show_sql: true
+      format_sql: true
