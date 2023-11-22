@@ -1,6 +1,7 @@
 package com.iprody.user.profile.userprofileservice.service.service;
 
 import com.iprody.user.profile.userprofileservice.entity.User;
+import com.iprody.user.profile.userprofileservice.entity.UserDetails;
 import com.iprody.user.profile.userprofileservice.exception.ResourceNotFoundException;
 import com.iprody.user.profile.userprofileservice.service.AbstractIntegrationTestBase;
 import com.iprody.user.profile.userprofileservice.service.UserService;
@@ -39,6 +40,9 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
     private static final String UPDATED_SUFFIX = " updated";
     private static final String CREATED_AT_FIELD = "createdAt";
     private static final String UPDATED_AT_FIELD = "updatedAt";
+    private static final String USER_DETAILS_FIELD = "userDetails";
+    private static final String FOURTH_TELEGRAM_ID = "@fourthTelegram_id";
+    private static final String PHONE_NUMBER_TO_SAVE = "+15095629821";
 
     @Autowired
     private UserService userService;
@@ -46,10 +50,15 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
     @Order(1)
     @Test
     void shouldSaveUserSuccessfully(SoftAssertions softly) {
+        final UserDetails userDetailsForKatie = new UserDetails();
+        userDetailsForKatie.setTelegramId(FOURTH_TELEGRAM_ID);
+        userDetailsForKatie.setPhoneNumber(PHONE_NUMBER_TO_SAVE);
+
         final User userKatieWalsh = new User();
         userKatieWalsh.setFirstName(FIRST_NAME_KATIE);
         userKatieWalsh.setLastName(LAST_NAME_WALSH);
         userKatieWalsh.setEmail(EMAIL_KATIE_WALSH);
+        userKatieWalsh.setUserDetails(userDetailsForKatie);
 
         final User savedKatieWalsh = userService.save(userKatieWalsh);
 
@@ -65,11 +74,15 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
     @Order(2)
     @Test
     void shouldUpdateExistingUser(SoftAssertions softly) {
-        final User userToUpdate = new User();
-        userToUpdate.setFirstName(FIRST_NAME_WACKY + UPDATED_SUFFIX);
-        userToUpdate.setLastName(LAST_NAME_WALSH + UPDATED_SUFFIX);
-        userToUpdate.setEmail(EMAIL_WACKY_WALSH);
-        userToUpdate.setId(2L);
+        final UserDetails userDetails = new UserDetails();
+        userDetails.setId(2);
+        userDetails.setTelegramId("+919542348755");
+        userDetails.setPhoneNumber("@secondTelegram_id");
+
+        final User userToUpdate = createUser(
+                2L, FIRST_NAME_WACKY + UPDATED_SUFFIX, LAST_NAME_WALSH + UPDATED_SUFFIX, EMAIL_WACKY_WALSH);
+        userToUpdate.setUserDetails(userDetails);
+
         final User updatedUser = userService.save(userToUpdate);
 
         softly.assertThat(updatedUser).isNotNull();
@@ -117,7 +130,7 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
         softly.assertThat(users.size()).isEqualTo(4);
 
         final RecursiveComparisonConfiguration comparisonConfiguration = RecursiveComparisonConfiguration.builder()
-                .withIgnoredFields(CREATED_AT_FIELD, UPDATED_AT_FIELD)
+                .withIgnoredFields(CREATED_AT_FIELD, UPDATED_AT_FIELD, USER_DETAILS_FIELD)
                 .build();
 
         final User johnWalsh = createUser(1L, FIRST_NAME_JOHN, LAST_NAME_WALSH, EMAIL_JOHN_WALSH);
@@ -141,7 +154,7 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
         final User katieWalsh = createUser(4L, FIRST_NAME_KATIE, LAST_NAME_WALSH, EMAIL_KATIE_WALSH);
 
         final RecursiveComparisonConfiguration comparisonConfiguration = RecursiveComparisonConfiguration.builder()
-                .withIgnoredFields(CREATED_AT_FIELD, UPDATED_AT_FIELD)
+                .withIgnoredFields(CREATED_AT_FIELD, UPDATED_AT_FIELD, USER_DETAILS_FIELD)
                 .build();
 
         softly.assertThat(users)
@@ -152,10 +165,15 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
     @Order(7)
     @Test
     void shouldThrowDataIntegrityViolationException_whenEmailUniquenessConstraintFailed() {
+        final UserDetails userDetails = new UserDetails();
+        userDetails.setPhoneNumber("+14253021325");
+        userDetails.setTelegramId("@dataIntegrity_Violation");
+
         final User user = new User();
         user.setFirstName(FIRST_NAME_LEWIS);
         user.setLastName(LAST_NAME_WALSH);
         user.setEmail(EMAIL_LEWIS_WALSH);
+        user.setUserDetails(userDetails);
 
         assertThatThrownBy(() -> userService.save(user))
                 .isExactlyInstanceOf(DataIntegrityViolationException.class)
