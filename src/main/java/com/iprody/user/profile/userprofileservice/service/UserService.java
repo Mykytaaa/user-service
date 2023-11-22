@@ -11,8 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -106,15 +104,6 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         ResourceNotFoundException.ErrorMessage.ofMail(USER_DOMAIN_NAME, email)));
-    }
-
-    /**
-     * Find all existent User records in database.
-     *
-     * @return List<User> The found List of User entities.
-     */
-    public List<User> findAll() {
-        return userRepository.findAll();
     }
 
     /**

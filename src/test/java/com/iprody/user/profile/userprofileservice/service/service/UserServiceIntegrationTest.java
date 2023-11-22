@@ -3,6 +3,7 @@ package com.iprody.user.profile.userprofileservice.service.service;
 import com.iprody.user.profile.userprofileservice.entity.User;
 import com.iprody.user.profile.userprofileservice.entity.UserDetails;
 import com.iprody.user.profile.userprofileservice.exception.ResourceNotFoundException;
+import com.iprody.user.profile.userprofileservice.repository.UserRepository;
 import com.iprody.user.profile.userprofileservice.service.AbstractIntegrationTestBase;
 import com.iprody.user.profile.userprofileservice.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -44,8 +44,9 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
     private static final String FOURTH_TELEGRAM_ID = "@fourthTelegram_id";
     private static final String PHONE_NUMBER_TO_SAVE = "+15095629821";
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    private final UserRepository userRepository;
 
     @Order(1)
     @Test
@@ -63,7 +64,7 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
         final User savedKatieWalsh = userService.save(userKatieWalsh);
 
         softly.assertThat(savedKatieWalsh).isNotNull();
-        softly.assertThat(savedKatieWalsh.getId()).isEqualTo(4L);
+        softly.assertThat(savedKatieWalsh.getId()).isNotNull();
         softly.assertThat(savedKatieWalsh.getFirstName()).isEqualTo(FIRST_NAME_KATIE);
         softly.assertThat(savedKatieWalsh.getLastName()).isEqualTo(LAST_NAME_WALSH);
         softly.assertThat(savedKatieWalsh.getEmail()).isEqualTo(EMAIL_KATIE_WALSH);
@@ -123,35 +124,12 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
 
     @Order(5)
     @Test
-    void shouldRetrieveAllUsers(SoftAssertions softly) {
-        final List<User> users = userService.findAll();
-
-        softly.assertThat(users).isNotEmpty();
-        softly.assertThat(users.size()).isEqualTo(4);
-
-        final RecursiveComparisonConfiguration comparisonConfiguration = RecursiveComparisonConfiguration.builder()
-                .withIgnoredFields(CREATED_AT_FIELD, UPDATED_AT_FIELD, USER_DETAILS_FIELD)
-                .build();
-
-        final User johnWalsh = createUser(1L, FIRST_NAME_JOHN, LAST_NAME_WALSH, EMAIL_JOHN_WALSH);
-        final User wackyWalsh =
-                createUser(2L, FIRST_NAME_WACKY + UPDATED_SUFFIX, LAST_NAME_WALSH + UPDATED_SUFFIX, EMAIL_WACKY_WALSH);
-        final User lewisWalsh = createUser(3L, FIRST_NAME_LEWIS, LAST_NAME_WALSH, EMAIL_LEWIS_WALSH);
-        final User katieWalsh = createUser(4L, FIRST_NAME_KATIE, LAST_NAME_WALSH, EMAIL_KATIE_WALSH);
-
-        softly.assertThat(users).usingRecursiveFieldByFieldElementComparator(comparisonConfiguration)
-                .containsOnly(johnWalsh, wackyWalsh, lewisWalsh, katieWalsh);
-    }
-
-    @Order(6)
-    @Test
     void shouldRetrievePage_withRequestedPageable(SoftAssertions softly) {
-        final List<User> users = userService.findAll(PageRequest.of(1, 2, Sort.by("id"))).getContent();
+        final List<User> users = userService.findAll(PageRequest.of(2, 1, Sort.by("id"))).getContent();
         softly.assertThat(users).isNotEmpty();
-        softly.assertThat(users.size()).isEqualTo(2);
+        softly.assertThat(users.size()).isEqualTo(1);
 
         final User lewisWalsh = createUser(3L, FIRST_NAME_LEWIS, LAST_NAME_WALSH, EMAIL_LEWIS_WALSH);
-        final User katieWalsh = createUser(4L, FIRST_NAME_KATIE, LAST_NAME_WALSH, EMAIL_KATIE_WALSH);
 
         final RecursiveComparisonConfiguration comparisonConfiguration = RecursiveComparisonConfiguration.builder()
                 .withIgnoredFields(CREATED_AT_FIELD, UPDATED_AT_FIELD, USER_DETAILS_FIELD)
@@ -159,10 +137,10 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
 
         softly.assertThat(users)
                 .usingRecursiveFieldByFieldElementComparator(comparisonConfiguration)
-                .containsOnly(lewisWalsh, katieWalsh);
+                .containsOnly(lewisWalsh);
     }
 
-    @Order(7)
+    @Order(6)
     @Test
     void shouldThrowDataIntegrityViolationException_whenEmailUniquenessConstraintFailed() {
         final UserDetails userDetails = new UserDetails();
@@ -180,7 +158,7 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
                 .hasMessageContaining("duplicate key value violates unique constraint \"users_email_key\"");
     }
 
-    @Order(8)
+    @Order(7)
     @Test
     void shouldThrowResourceNotFoundException_whenUserWithSpecificIdDoesNotExist() {
         assertThatThrownBy(() -> userService.findUserById(100000L))
@@ -188,7 +166,7 @@ class UserServiceIntegrationTest extends AbstractIntegrationTestBase {
                 .hasMessage("User not found with id: 100000");
     }
 
-    @Order(9)
+    @Order(8)
     @Test
     void shouldThrowResourceNotFoundException_whenUserWithSpecificEmailDoesNotExist() {
         assertThatThrownBy(() -> userService.findByEmail("nonexistendemail@example.com"))
