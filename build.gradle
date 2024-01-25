@@ -35,6 +35,7 @@ dependencies {
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${versions.openApiWebMvc}"
     implementation "org.mapstruct:mapstruct:${versions.mapStruct}"
     implementation "org.mapstruct:mapstruct:${versions.mapStruct}"
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 
     runtimeOnly 'org.postgresql:postgresql'
