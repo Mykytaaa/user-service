@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: iPrody/iPrody-Devs-Gr0000000007-user-profile
+  IMAGE_NAME: Mykytaaa/user-profile
 
 jobs:
   build-and-push-image:

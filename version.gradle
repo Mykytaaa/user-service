@@ -5,6 +5,8 @@ ext {
             'liquibaseCore' : '4.25.0',
             'mapStruct' : '1.5.5.Final',
             'hibernateValidator' : '8.0.1.Final',
-            'openApiWebMvc' : '2.3.0'
+            'openApiWebMvc' : '2.3.0',
+            'micrometerTracing' : '1.0.0',
+            'logcapture' : '1.3.2'
     ]
 }

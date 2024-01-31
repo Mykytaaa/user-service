@@ -8,18 +8,20 @@ plugins {
 
 apply from: 'version.gradle'
 
-group = 'com.iprody'
+group = 'com.mykytaaa'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 repositories {
     mavenCentral()
     maven {
         name = "GitHubPackages"
-        url = "https://maven.pkg.github.com/iPrody/iPrody-Devs-Gr0000000007-user-profile"
+        url = "https://maven.pkg.github.com/Mykytaaa/user-profile"
         credentials{
             username = System.getenv("GITHUB_ACTOR")
             password = System.getenv("GITHUB_TOKEN")
@@ -36,6 +38,11 @@ dependencies {
     implementation "org.mapstruct:mapstruct:${versions.mapStruct}"
     implementation "org.mapstruct:mapstruct:${versions.mapStruct}"
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-tracing'
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation platform("io.micrometer:micrometer-tracing-bom:${versions.micrometerTracing}")
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
 
 
     runtimeOnly 'org.postgresql:postgresql'
@@ -43,6 +50,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation "org.testcontainers:postgresql:${versions.testContainers}"
+    testImplementation 'io.micrometer:micrometer-observation-test'
+    testImplementation "org.logcapture:logcapture-core:${versions.logcapture}"
+    testImplementation "org.logcapture:logcapture-junit5:${versions.logcapture}"
 
     compileOnly "org.projectlombok:lombok:${versions.lombok}"
     annotationProcessor "org.projectlombok:lombok"
@@ -78,7 +88,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/iPrody/iPrody-Devs-Gr0000000007-user-profile"
+            url = "https://maven.pkg.github.com/Mykytaaa/user-profile"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
