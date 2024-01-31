@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <property name="LOG_PATTERN" value="trace-id=%mdc{traceId} span-id=%mdc{spanId} %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%kvp- %msg%n"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="org.springframework.web" level="DEBUG"/>
+    <logger name="reactor" level="DEBUG"/>
+    <logger name="org.springframework.jdbc.core" level="DEBUG"/>
+    <logger name="com.iprody.user.profile" level="INFO"/>
+</configuration>

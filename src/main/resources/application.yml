@@ -12,3 +12,8 @@ spring:
       ddl-auto: validate
 springdoc:
   show-actuator: true
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
