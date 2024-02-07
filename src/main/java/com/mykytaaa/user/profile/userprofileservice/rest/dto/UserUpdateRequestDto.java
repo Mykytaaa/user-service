@@ -27,7 +27,7 @@ public class UserUpdateRequestDto {
      * The first name of the user.
      */
     @Schema(description = "The first name of the user")
-    @NotNull
+    @NotNull(message = "First name should not be null")
     @Size(min = 1, max = 50)
     private String firstName;
 
@@ -35,7 +35,7 @@ public class UserUpdateRequestDto {
      * The last name of the user.
      */
     @Schema(description = "The last name of the user")
-    @NotNull
+    @NotNull(message = "Last name should not be null")
     @Size(min = 1, max = 50)
     private String lastName;
 

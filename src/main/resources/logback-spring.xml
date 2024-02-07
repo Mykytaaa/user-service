@@ -16,5 +16,5 @@
     <logger name="org.springframework.web" level="DEBUG"/>
     <logger name="reactor" level="DEBUG"/>
     <logger name="org.springframework.jdbc.core" level="DEBUG"/>
-    <logger name="com.iprody.user.profile" level="INFO"/>
+    <logger name="com.mykytaaa.user.profile" level="INFO"/>
 </configuration>
