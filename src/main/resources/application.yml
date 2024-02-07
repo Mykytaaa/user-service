@@ -30,5 +30,5 @@ server:
     key-store-password: securepass
     protocol: TLS
     enabled-protocols: TLSv1.2,TLSv1.3
-    trust-store: classpath:security/dev_inquiry_service_truststore.p12
+    trust-store: classpath:security/user_profile_truststore_dev.p12
     trust-store-password: securepass

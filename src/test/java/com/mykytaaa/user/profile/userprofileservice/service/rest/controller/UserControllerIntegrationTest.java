@@ -1,5 +1,6 @@
 package com.mykytaaa.user.profile.userprofileservice.service.rest.controller;
 
+import com.mykytaaa.user.profile.userprofileservice.rest.dto.ApiErrorDto;
 import com.mykytaaa.user.profile.userprofileservice.rest.dto.UserCreateRequestDto;
 import com.mykytaaa.user.profile.userprofileservice.rest.dto.UserDetailsCreateRequestDto;
 import com.mykytaaa.user.profile.userprofileservice.rest.dto.UserDetailsResponseDto;
@@ -33,9 +34,10 @@ import java.util.List;
 @AutoConfigureWebTestClient
 public class UserControllerIntegrationTest extends AbstractIntegrationTestBaseController {
 
-    public static final String URL_USER_CONTROLLER = "/api/v1/users";
-    public static final String URL_ID = "/{id}";
-    public static final String URL_CONTACTS_ID = "/user-contacts/{id}";
+    private static final String URL_USER_CONTROLLER = "/api/v1/users";
+    private static final String URL_ID = "/{id}";
+    private static final String URL_CONTACTS_ID = "/user-contacts/{id}";
+    private static final String URL_CONTACTS_BY_USER_ID = "/user-contacts/by-user-id/{id}";
 
     private static final String TEST_CREATE_USER_NAME = "testCreateUserName";
     private static final String TEST_CREATE_USER_LAST_NAME = "testCreateLastName";
@@ -58,6 +60,9 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTestBaseCo
 
     private static final String USER_DETAILS_TO_UPDATE_PHONE_NUMBER = "+17202334324";
     private static final String USER_DETAILS_TO_UPDATE_TELEGRAM_ID = "@max_updated_telegramId";
+
+    private static final String VALIDATION_ERROR_OCCURRED = "Validation error occurred";
+    private static final String RESOURCE_NOT_FOUND = "Resource not found";
 
     private final WebTestClient webTestClient;
 
@@ -101,6 +106,40 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTestBaseCo
                 }).verifyComplete();
     }
 
+    @Test
+    void shouldFailCreateUserWithUserDetails_withInvalidData(SoftAssertions softly) {
+
+        final List<String> errors = List.of("Please provide a valid email address",
+                "The length of your first name should ne between 1 and 50 characters",
+                "The length of your last name should ne between 1 and 50 characters");
+
+        final UserCreateRequestDto testUserCreateRequestDto = new UserCreateRequestDto(
+                "FirstNameMoreThan50ErrorFirstNameMoreThan50ErrorFirstNameMoreThan50Error",
+                "LastNameMoreThan50ErrorLastNameMoreThan50ErrorLastNameMoreThan50Error",
+                "brokenemail",
+                new UserDetailsCreateRequestDto(
+                        TEST_CREATE_USER_DETAILS_NUMBER,
+                        TEST_CREATE_USER_DETAILS_TELEGRAM
+                )
+        );
+
+        StepVerifier.create(webTestClient.post()
+                        .uri(URL_USER_CONTROLLER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(testUserCreateRequestDto))
+                        .exchange()
+                        .expectStatus().isBadRequest()
+                        .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+                        .returnResult(ApiErrorDto.class)
+                        .getResponseBody()
+                ).assertNext(response -> {
+                    softly.assertThat(response.status()).isEqualTo(400);
+                    softly.assertThat(response.message()).isEqualTo(VALIDATION_ERROR_OCCURRED);
+                    softly.assertThat(response.details()).containsExactlyInAnyOrderElementsOf(errors);
+                })
+                .verifyComplete();
+    }
+
     @Order(2)
     @Test
     void shouldSuccessfullyUpdateUser(SoftAssertions softly) {
@@ -136,6 +175,36 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTestBaseCo
         ).verifyComplete();
     }
 
+    @Test
+    void shouldFailUpdateUser_withInvalidData(SoftAssertions softly) {
+
+        final List<String> errors = List.of("First name should not be null", "Last name should not be null");
+
+        final UserUpdateRequestDto userUpdateRequestDto = new UserUpdateRequestDto(
+                1, null, null, TEST_UPDATE_USER_EMAIL,
+                new UserDetailsUpdateDto(
+                        1,
+                        TEST_UPDATE_USER_DETAILS_PHONE_NUMBER,
+                        TEST_UPDATE_USER_DETAILS_TELEGRAM_ID
+                ));
+
+        StepVerifier.create(webTestClient.put()
+                        .uri(URL_USER_CONTROLLER + URL_ID, userUpdateRequestDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(userUpdateRequestDto))
+                        .exchange()
+                        .expectStatus().isBadRequest()
+                        .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+                        .returnResult(ApiErrorDto.class)
+                        .getResponseBody())
+                .assertNext(response -> {
+                    softly.assertThat(response.status()).isEqualTo(400);
+                    softly.assertThat(response.message()).contains(VALIDATION_ERROR_OCCURRED);
+                    softly.assertThat(response.details()).containsExactlyInAnyOrderElementsOf(errors);
+                })
+                .verifyComplete();
+    }
+
     @Order(3)
     @Test
     void shouldSuccessfullyFindUserById(SoftAssertions softly) {
@@ -164,6 +233,22 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTestBaseCo
         }).verifyComplete();
     }
 
+    @Test
+    void shouldFailRetrieveUserWithNonExistingId(SoftAssertions softly) {
+        StepVerifier.create(webTestClient.get()
+                .uri(URL_USER_CONTROLLER + URL_ID, 10000)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+                .returnResult(ApiErrorDto.class)
+                .getResponseBody()
+        ).assertNext(response -> {
+            softly.assertThat(response.status()).isEqualTo(404);
+            softly.assertThat(response.message()).isEqualTo(RESOURCE_NOT_FOUND);
+            softly.assertThat(response.details()).containsExactly("User not found with id: 10000");
+        }).verifyComplete();
+    }
+
     @Order(4)
     @Test
     void shouldSuccessfullyFindUsers_withPageable(SoftAssertions softly) {
@@ -185,19 +270,21 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTestBaseCo
                 .expectHeader()
                 .contentTypeCompatibleWith(MediaType.APPLICATION_JSON);
 
-        final List<UserResponseDto> actualUserListResponseDto =
-                responseSpec.returnResult(new ParameterizedTypeReference<UserResponseDto>() {
-                }).getResponseBody().collectList().block();
+        responseSpec.returnResult(new ParameterizedTypeReference<UserResponseDto>() {
+                })
+                .getResponseBody()
+                .collectList()
+                .subscribe(actualUserListResponseDto -> {
+                    final RecursiveComparisonConfiguration comparisonConfiguration =
+                            RecursiveComparisonConfiguration.builder()
+                            .withIgnoredFields("createdAt", "updatedAt",
+                                    "userDetailsResponseDto.createdAt", "userDetailsResponseDto.updatedAt")
+                            .build();
 
-        final RecursiveComparisonConfiguration comparisonConfiguration = RecursiveComparisonConfiguration.builder()
-                .withIgnoredFields("createdAt", "updatedAt",
-                        "userDetailsResponseDto.createdAt", "userDetailsResponseDto.updatedAt")
-                .build();
-
-
-        softly.assertThat(actualUserListResponseDto)
-                .usingRecursiveFieldByFieldElementComparator(comparisonConfiguration)
-                .containsOnly(userWackyWalshToCompare);
+                    softly.assertThat(actualUserListResponseDto)
+                            .usingRecursiveFieldByFieldElementComparator(comparisonConfiguration)
+                            .containsOnly(userWackyWalshToCompare);
+                });
     }
 
     @Order(5)
@@ -228,6 +315,36 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTestBaseCo
                 }).verifyComplete();
     }
 
+    @Test
+    void shouldFailUpdateUserDetails_withInvalidData(SoftAssertions softly) {
+
+        final List<String> errors = List.of("Telegram id does not match pattern",
+                "Phone number does not match pattern");
+
+        final UserDetailsUpdateRequestDto userDetailsUpdateRequestDto = new UserDetailsUpdateRequestDto(
+                5,
+                "17202334324",
+                "updatedWrong_tg_id"
+        );
+
+        StepVerifier.create(webTestClient.put()
+                .uri(URL_USER_CONTROLLER + URL_CONTACTS_ID, userDetailsUpdateRequestDto.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(userDetailsUpdateRequestDto))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+                .returnResult(ApiErrorDto.class)
+                .getResponseBody()
+        ).assertNext(response -> {
+            softly.assertThat(response.status()).isEqualTo(400);
+            softly.assertThat(response.message()).isEqualTo(VALIDATION_ERROR_OCCURRED);
+            softly.assertThat(response.details()).containsExactlyInAnyOrderElementsOf(errors);
+        }).verifyComplete();
+
+
+    }
+
     @Order(6)
     @Test
     void shouldSuccessfullyFindUserDetailsById(SoftAssertions softly) {
@@ -249,12 +366,30 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTestBaseCo
                 }).verifyComplete();
     }
 
+    @Test
+    void shouldFailRetrieveUserDetailsByIdWithNonExistingId(SoftAssertions softly) {
+        StepVerifier.create(webTestClient.get()
+                        .uri(URL_USER_CONTROLLER + URL_CONTACTS_ID, 10000)
+                        .exchange()
+                        .expectStatus()
+                        .isNotFound()
+                        .expectHeader()
+                        .contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+                        .returnResult(ApiErrorDto.class)
+                        .getResponseBody())
+                .assertNext(response -> {
+                    softly.assertThat(response.status()).isEqualTo(404);
+                    softly.assertThat(response.message()).isEqualTo(RESOURCE_NOT_FOUND);
+                    softly.assertThat(response.details()).containsExactly("User Details not found with id: 10000");
+                }).verifyComplete();
+    }
+
     @Order(7)
     @Test
     void shouldSuccessfullyFindUserDetailsByUserId(SoftAssertions softly) {
         StepVerifier.create(
                 webTestClient.get()
-                        .uri(URL_USER_CONTROLLER + "/user-contacts/by-user-id/{id}", 2)
+                        .uri(URL_USER_CONTROLLER + URL_CONTACTS_BY_USER_ID, 2)
                         .exchange()
                         .expectStatus().isOk()
                         .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
@@ -266,6 +401,24 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTestBaseCo
             softly.assertThat(actualUserDetailsResponseDto.getTelegramId()).isEqualTo(USER_WACKY_TELEGRAM_ID);
             softly.assertThat(actualUserDetailsResponseDto.getCreatedAt()).isNotNull();
             softly.assertThat(actualUserDetailsResponseDto.getUpdatedAt()).isNotNull();
+        }).verifyComplete();
+    }
+
+    @Test
+    void shouldFailRetrieveUserDetailsByUserIdWithNonExistingId(SoftAssertions softly) {
+        StepVerifier.create(
+                webTestClient.get()
+                        .uri(URL_USER_CONTROLLER + URL_CONTACTS_BY_USER_ID, 10000)
+                        .exchange()
+                        .expectStatus().isNotFound()
+                        .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+                        .returnResult(ApiErrorDto.class)
+                        .getResponseBody()
+        ).assertNext(response -> {
+            softly.assertThat(response.status()).isEqualTo(404);
+            softly.assertThat(response.message()).isEqualTo(RESOURCE_NOT_FOUND);
+            softly.assertThat(response.details())
+                    .containsExactly("User Details not found user details with user id: 10000");
         }).verifyComplete();
     }
 }
