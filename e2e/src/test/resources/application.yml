@@ -1,0 +1,5 @@
+user-profile-service:
+  ssl:
+    trust-store: classpath:security/user_profile_truststore_dev.p12
+    trust-store-password: securepass
+    version: V_1_3
