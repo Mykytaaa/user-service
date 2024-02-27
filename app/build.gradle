@@ -44,8 +44,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
-
-    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'org.postgresql:postgresql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'

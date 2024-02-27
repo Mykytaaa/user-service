@@ -2,12 +2,12 @@ spring:
   liquibase:
     enabled: true
   datasource:
-    url: jdbc:h2:mem:user-profile
-    username: sa
-    password: sa
-    driverClassName: org.h2.Driver
+    url: jdbc:postgresql://${RDS_LINK}
+    username: postgres
+    password: ${POSTGRES_PASSWORD}
+    driverClassName: org.postgresql.Driver
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
 springdoc:
@@ -27,7 +27,7 @@ management:
 server:
   port: 8080
   ssl:
-    enabled: false
+    enabled: true
     key-store-type: PKCS12
     key-store: classpath:security/user_profile_keystore_dev.p12
     key-store-password: securepass
