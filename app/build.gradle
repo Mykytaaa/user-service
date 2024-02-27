@@ -42,7 +42,7 @@ dependencies {
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
     implementation platform("io.micrometer:micrometer-tracing-bom:${versions.micrometerTracing}")
     implementation 'org.springframework.boot:spring-boot-starter-aop'
-
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
 
     runtimeOnly 'org.postgresql:postgresql'

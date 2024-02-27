@@ -25,3 +25,6 @@ public abstract class AbstractIntegrationTestBase {
         registry.add("spring.datasource.password", CONTAINER::getPassword);
     }
 }
+
+
+
