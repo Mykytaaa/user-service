@@ -6,7 +6,7 @@ volumes:
 
 services:
   product-service:
-    image: user-profile
+    image: user-profile-service
     build:
       dockerfile: Dockerfile
     container_name: user-profile
@@ -27,14 +27,3 @@ services:
       - db-data:/var/lib/postgresql/data
     ports:
       - "5434:5432"
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-    container_name: pgadmin_container
-    ports:
-      - "8888:80"
-    depends_on:
-      - postgres
