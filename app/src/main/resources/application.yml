@@ -1,6 +1,6 @@
 spring:
   liquibase:
-    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
   datasource:
     url: jdbc:postgresql://localhost:5432/user-profile
     username: postgres
@@ -32,3 +32,22 @@ server:
     enabled-protocols: TLSv1.2,TLSv1.3
     trust-store: classpath:security/user_profile_truststore_dev.p12
     trust-store-password: securepass
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  liquibase:
+    change-log: classpath:db/changelog/changeset/test-data-e2e/db.changelog-master-test.yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: liquibase, health, mappings

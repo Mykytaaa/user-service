@@ -1,0 +1,35 @@
+version: '3.9'
+
+volumes:
+  db-data-user-profile-service-e2e:
+    driver: local
+
+services:
+  user-profile-service:
+    image: user-profile-service
+    container_name: user-profile-service-e2e
+    build:
+      context: ../app
+      dockerfile: ../app/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-e2e:5432/${POSTGRES_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15.1-alpine
+    container_name: postgres-e2e
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+    volumes:
+      - db-data-user-profile-service-e2e:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
