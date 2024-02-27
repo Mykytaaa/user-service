@@ -14,7 +14,7 @@ import java.util.Map;
 
 @UtilityClass
 public class ModelMapper {
-    private static final String ERROR_DETAILS_SEPARATOR = "\\s*;\\s*";
+    private static final String ERROR_DETAILS_SEPARATOR = ",";
 
     public UserResponseDto toResponseDto(DataTable dataTable) {
         final var entry = dataTable.asMap();
@@ -44,7 +44,7 @@ public class ModelMapper {
     }
 
     public List<String> toErrorDetailsList(Map<String, String> map) {
-        return Arrays.stream(map.get("details").split(ERROR_DETAILS_SEPARATOR)).toList();
+        return Arrays.stream(map.get("details").split("\\s*" + ERROR_DETAILS_SEPARATOR + "\\s*")).toList();
     }
 
     public UserUpdateRequestDto toUserUpdateRequestDto(DataTable dataTable){
@@ -60,6 +60,16 @@ public class ModelMapper {
                         .phoneNumber(entry.get("userDetails.phone_number"))
                         .telegramId(entry.get("userDetails.telegram_id"))
                         .build())
+                .build();
+    }
+
+    public UserDetailsResponseDto toUserDetailsResponseDto(DataTable dataTable) {
+        final var entry = dataTable.asMap();
+
+        return UserDetailsResponseDto.builder()
+                .id(Long.valueOf(entry.get("id")))
+                .phoneNumber(entry.get("phone_number"))
+                .telegramId(entry.get("telegram_id"))
                 .build();
     }
 }
