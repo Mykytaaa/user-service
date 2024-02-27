@@ -17,10 +17,13 @@ management:
     enabled: true
     sampling:
       probability: 1.0
+  endpoint:
+    metrics:
+      enabled: true
   endpoints:
     web:
       exposure:
-        include: liquibase, health
+        include: liquibase, health, mappings, prometheus
 server:
   port: 8080
   ssl:
@@ -50,4 +53,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: liquibase, health, mappings
+        include: liquibase, health, mappings, prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
