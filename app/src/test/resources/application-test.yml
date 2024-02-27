@@ -1,6 +1,6 @@
 spring:
   liquibase:
-    change-log: classpath:db/changelog/db.changelog-master-test.yaml
+    change-log: classpath:db/changelog/changeset/test-data-e2e/db.changelog-master-test.yaml
   jpa:
     properties.hibernate:
       show_sql: true
