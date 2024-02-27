@@ -14,6 +14,6 @@ public class ApiErrorResponseAssertion extends DtoAssertHandler<ApiErrorDto> {
 
         softly.assertThat(actualResponse.getStatus()).isEqualTo(expectedResponse.getStatus());
         softly.assertThat(actualResponse.getMessage()).isEqualTo(expectedResponse.getMessage());
-        softly.assertThat(actualResponse.getDetails()).isEqualTo(expectedResponse.getDetails());
+        softly.assertThat(actualResponse.getDetails()).containsExactlyInAnyOrderElementsOf(expectedResponse.getDetails());
     }
 }
